@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>offer到</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #e0f7fa, #ffffff);
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      color: #333;
+    }
+    .container {
+      max-width: 900px;
+      margin: 30px auto;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      padding: 30px;
+    }
+    h1 {
+      text-align: center;
+      color: #0077b6;
+      font-weight: 600;
+    }
+    .upload-area {
+      border: 2px dashed #90caf9;
+      border-radius: 12px;
+      padding: 30px;
+      text-align: center;
+      cursor: pointer;
+      background: #f1f8ff;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .upload-area:hover {
+      background: #e3f2fd;
+      border-color: #42a5f5;
+    }
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+    .controls label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 5px;
+    }
+    .controls input, .controls select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    #previewContainer {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .preview {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 5px;
+      background: #fafafa;
+      text-align: center;
+    }
+    .preview img {
+      max-width: 100%;
+      border-radius: 4px;
+    }
+    button {
+      background: #42a5f5;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+      width: 100%;
+    }
+    button:hover {
+      background: #1e88e5;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📸 祝你夏令营 预推免顺利！</h1>
+
+    <div class="upload-area" id="uploadArea">
+      点击或拖拽上传照片
+      <input type="file" id="upload" multiple accept="image/*" style="display:none;">
+    </div>
+
+    <div class="controls">
+      <div>
+        <label for="bgColor">选择新底色:</label>
+        <input type="color" id="bgColor" value="#ff0000">
+      </div>
+      <div>
+        <label for="sizeTemplate">尺寸模板:</label>
+        <select id="sizeTemplate">
+          <option value="295x413">1寸 (295x413)</option>
+          <option value="413x579">2寸 (413x579)</option>
+          <option value="827x1063">护照 (827x1063)</option>
+          <option value="custom">自定义</option>
+        </select>
+      </div>
+      <div>
+        <label for="customWidth">宽度 (px):</label>
+        <input type="number" id="customWidth" placeholder="自定义宽度">
+      </div>
+      <div>
+        <label for="customHeight">高度 (px):</label>
+        <input type="number" id="customHeight" placeholder="自定义高度">
+      </div>
+    </div>
+
+    <div id="previewContainer"></div>
+
+    <button id="downloadAllBtn" style="display:none;">下载所有处理好的照片</button>
+  </div>
+
+  <canvas id="canvas" style="display:none;"></canvas>
+
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.21.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@2.2.0"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+  <script>
+    const uploadArea = document.getElementById('uploadArea');
+    const upload = document.getElementById('upload');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const previewContainer = document.getElementById('previewContainer');
+    const downloadAllBtn = document.getElementById('downloadAllBtn');
+    const bgColorPicker = document.getElementById('bgColor');
+    const sizeTemplate = document.getElementById('sizeTemplate');
+    const customWidth = document.getElementById('customWidth');
+    const customHeight = document.getElementById('customHeight');
+    let net, zip;
+
+    bodyPix.load().then(model => net = model);
+
+    uploadArea.addEventListener('click', () => upload.click());
+    uploadArea.addEventListener('dragover', e => {
+      e.preventDefault();
+      uploadArea.style.background = '#e3f2fd';
+    });
+    uploadArea.addEventListener('dragleave', e => {
+      e.preventDefault();
+      uploadArea.style.background = '#f1f8ff';
+    });
+    uploadArea.addEventListener('drop', e => {
+      e.preventDefault();
+      uploadArea.style.background = '#f1f8ff';
+      upload.files = e.dataTransfer.files;
+      processFiles(upload.files);
+    });
+    upload.addEventListener('change', () => processFiles(upload.files));
+
+    async function processFiles(files) {
+      previewContainer.innerHTML = '';
+      zip = new JSZip();
+      Array.from(files).forEach(async (file, index) => {
+        const img = new Image();
+        img.src = URL.createObjectURL(file);
+        img.onload = async () => {
+          const segmentation = await net.segmentPerson(img, {
+            internalResolution: 'medium',
+            segmentationThreshold: 0.7
+          });
+          const bgColor = hexToRgba(bgColorPicker.value, 255);
+          const mask = bodyPix.toMask(segmentation, {r:0,g:0,b:0,a:0}, bgColor);
+
+          const [w, h] = getTargetSize();
+          canvas.width = w;
+          canvas.height = h;
+          ctx.drawImage(img, 0, 0, w, h);
+          bodyPix.drawMask(canvas, img, mask, 1, 0, false);
+
+          canvas.toBlob(blob => {
+            const previewURL = URL.createObjectURL(blob);
+            const div = document.createElement('div');
+            div.className = 'preview';
+            div.innerHTML = `<img src="${previewURL}"><a href="${previewURL}" download="photo_${index+1}.jpg">下载</a>`;
+            previewContainer.appendChild(div);
+            zip.file(`photo_${index+1}.jpg`, blob);
+            downloadAllBtn.style.display = 'block';
+          }, 'image/jpeg', 0.95);
+        };
+      });
+    }
+
+    function getTargetSize() {
+      const preset = sizeTemplate.value;
+      if (preset !== 'custom') {
+        return preset.split('x').map(Number);
+      }
+      return [
+        parseInt(customWidth.value) || 295,
+        parseInt(customHeight.value) || 413
+      ];
+    }
+
+    downloadAllBtn.addEventListener('click', () => {
+      zip.generateAsync({type:"blob"}).then(content => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(content);
+        a.download = "AI_photos.zip";
+        a.click();
+      });
+    });
+
+    function hexToRgba(hex, alpha) {
+      const bigint = parseInt(hex.slice(1), 16);
+      return {
+        r: (bigint >> 16) & 255,
+        g: (bigint >> 8) & 255,
+        b: bigint & 255,
+        a: alpha
+      };
+    }
+  </script>
+</body>
+</html>
