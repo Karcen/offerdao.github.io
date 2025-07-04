@@ -1,68 +1,94 @@
-## 📸 图片裁剪与压缩工具
+# 📸 offer到！AI 证件照换底色工具 / offer is here! AI Passport Photo Background Changer
 
-这是一个纯前端网页工具，支持上传图片后**自动裁剪、缩放和压缩**，并允许用户**自定义目标宽度、高度和JPEG质量**。处理后的图片可一键下载，无需后端服务。俺夏令营的时候反复遇到上传照片用PS太麻烦索性写了这个网页前端。
+这是一个纯前端的 AI 证件照处理工具，基于 **TensorFlow\.js** 和 **BodyPix / MediaPipe** 模型。
+支持 **批量上传照片**，**精准抠图**，**一键换底色**（红、蓝、白等），并内置常用证件照尺寸（1寸/2寸/护照）。
+无需服务器，直接在浏览器运行即可完成所有操作。
+做这个网页是因为报名夏令营不同的学校要上传不同要求的照片，很麻烦。
 
----
-
-### 🌟 功能 Features
-
-* ✅ **裁剪图片**：自动居中裁剪，保持用户设定的宽高比例。
-* ✅ **缩放尺寸**：支持自定义目标宽度（Width）和高度（Height）。
-* ✅ **压缩质量**：支持自定义 JPEG 压缩质量（1–100）。
-* ✅ **即时预览**：上传后立即显示处理效果预览。
-* ✅ **下载图片**：处理完成后可直接下载 JPG 格式图片。
-* ✅ **纯前端运行**：无需服务器，支持离线使用。
-* ✅ **响应式设计**：兼容桌面端和移动设备。
+This is a front-end AI passport photo tool powered by **TensorFlow\.js** and **BodyPix / MediaPipe** models.
+It supports **batch photo upload**, **precise background removal**, **one-click background replacement** (red, blue, white, etc.), and built-in common ID photo sizes (1-inch, 2-inch, passport).
+No server is required. Everything runs directly in your browser.
+I developed this web application because applying to different schools for summer camps requires uploading photos that meet various specifications, which can be quite troublesome. This tool aims to simplify the process by allowing users to easily crop, resize, and adjust the background color of their photos to meet the diverse requirements of each school.
 
 ---
 
-### 🖥️ 使用方法 Usage
+## 🌟 功能 Features
 
-1. **打开网页**
-   用浏览器（推荐 Chrome/Edge/Firefox）打开 `index.html` 文件。
+✅ **精准抠图**（AI 人像分割，发丝级效果）
+✅ **一键更换底色**（支持常用证件照背景色和自定义颜色）
+✅ **批量处理多张照片**
+✅ **内置标准证件照尺寸模板**（1寸、2寸、护照等）
+✅ **支持导出 JPG / PNG / WebP 格式**
+✅ **纯前端运行，无需安装，无需上传服务器**
 
-2. **设置参数**
-
-   * 输入目标宽度（px）
-   * 输入目标高度（px）
-   * 输入图片质量（1-100，数值越高质量越好但文件更大）
-
-3. **上传图片**
-   点击“上传文件”按钮，选择一张本地图片。
-
-4. **查看预览**
-   页面将显示处理后的图片。
-
-5. **下载图片**
-   点击“下载处理后的图片”按钮，保存图片到本地。
+✅ **Accurate person segmentation** (AI-powered, hair-level precision)
+✅ **One-click background replacement** (standard passport colors & custom colors)
+✅ **Batch processing of multiple photos**
+✅ **Built-in standard ID photo size templates** (1-inch, 2-inch, passport, etc.)
+✅ **Export to JPG / PNG / WebP formats**
+✅ **Fully client-side, no installation or server required**
 
 ---
 
-### 🛠 技术细节 Technical Details
+## 🖥️ 使用方法 Usage
 
-* 使用 **HTML5 Canvas API** 实现图片裁剪、缩放和压缩。
-* 支持的图片格式：
+### 📂 上传照片 Upload Photos
 
-  * 输入：`image/jpeg`, `image/png`, `image/webp` 等浏览器支持的格式
-  * 输出：`image/jpeg`
-* 压缩原理：
+* 点击或拖拽上传一张或多张图片
+* 支持格式：`JPG`, `PNG`, `WebP`
 
-  * 使用 `canvas.toBlob()` 方法按用户指定质量生成 JPG。
-* 完全运行在浏览器环境，无需服务器。
+### 🎨 设置参数 Adjust Settings
+
+* **选择目标底色**：红 / 蓝 / 白 / 自定义
+* **选择证件照尺寸**：1寸、2寸、护照等
+
+### ⚡ 自动处理 Process Automatically
+
+* AI 模型将自动识别前景与背景并替换颜色
+* 实时预览处理效果
+
+### 💾 下载 Download
+
+* 单张下载或批量下载（ZIP）
 
 ---
 
-### 📂 文件结构 File Structure
+## 📦 文件结构 File Structure
 
 ```
 project/
-├── index.html        # 主网页文件
-├── README.md         # 使用说明
+├── index.html         # 网页入口 HTML
+├── script.js          # 主逻辑代码（AI模型加载与处理）
+├── style.css          # 页面样式
+├── README.md          # 使用说明
 ```
 
 ---
 
-### 📜 许可 License
+## 🛠 技术栈 Tech Stack
 
-MIT License. 可自由修改、使用和分发。
+| 功能 Feature               | 技术 Technology                      |
+| ------------------------ | ---------------------------------- |
+| 人像分割 Person Segmentation | TensorFlow\.js, BodyPix, MediaPipe |
+| 前端界面 Frontend UI         | HTML5, CSS3, JavaScript            |
+| 批量处理 Batch Processing    | HTML5 Canvas, JSZip                |
 
+---
+
+## 📏 预置证件照尺寸 Built-in Sizes
+
+| 类型 Type     | 尺寸 Dimensions | 分辨率 DPI |
+| ----------- | ------------- | ------- |
+| 1寸 1-inch   | 295 x 413 px  | 300 dpi |
+| 2寸 2-inch   | 413 x 579 px  | 300 dpi |
+| 护照 Passport | 827 x 1063 px | 300 dpi |
+
+---
+
+## 📜 许可 License
+
+MIT License.
+自由修改、分发和商用。
+Free to modify, distribute, and use for commercial or personal purposes.
+
+---
