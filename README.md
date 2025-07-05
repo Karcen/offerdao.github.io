@@ -15,16 +15,16 @@ I developed this web application because applying to different schools for summe
 ## 🌟 功能 Features
 
 ✅ **精准抠图**（AI 人像分割，发丝级效果）
-✅ **一键更换底色**（支持常用证件照背景色和自定义颜色）
+✅ **一键更换底色**（支持常用证件照背景色和自定义颜色）（加载缓慢且效果不咋地）
 ✅ **批量处理多张照片**
-✅ **内置标准证件照尺寸模板**（1寸、2寸、护照等）
+✅ **内置标准证件照尺寸模板**（1寸、2寸、护照等）（第二版已删除该功能）
 ✅ **支持导出 JPG / PNG / WebP 格式**
 ✅ **纯前端运行，无需安装，无需上传服务器**
 
 ✅ **Accurate person segmentation** (AI-powered, hair-level precision)
-✅ **One-click background replacement** (standard passport colors & custom colors)
+✅ **One-click background replacement** (standard passport colors & custom colors) (slow and low quality)
 ✅ **Batch processing of multiple photos**
-✅ **Built-in standard ID photo size templates** (1-inch, 2-inch, passport, etc.)
+✅ **Built-in standard ID photo size templates** (1-inch, 2-inch, passport, etc.)（Cancelled in version 2）
 ✅ **Export to JPG / PNG / WebP formats**
 ✅ **Fully client-side, no installation or server required**
 
