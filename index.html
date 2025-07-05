@@ -111,7 +111,7 @@
     <div class="controls">
       <div class="checkbox-label">
         <input type="checkbox" id="enableBgChange">
-        <label for="enableBgChange">启用证件照背景更换</label>
+        <label for="enableBgChange">启用证件照背景更换（加载缓慢且效果不咋地orz）</label>
       </div>
       <div>
         <label for="bgColor">选择新底色:</label>
@@ -128,11 +128,11 @@
       </div>
       <div>
         <label for="customWidth">宽度 (px):</label>
-        <input type="number" id="customWidth" placeholder="自定义宽度">
+        <input type="number" id="customWidth" placeholder="自定义宽度" disabled>
       </div>
       <div>
         <label for="customHeight">高度 (px):</label>
-        <input type="number" id="customHeight" placeholder="自定义高度">
+        <input type="number" id="customHeight" placeholder="自定义高度" disabled>
       </div>
       <div>
         <label for="maxFileSize">最大文件大小 (MB):</label>
@@ -170,6 +170,12 @@
 
     enableBgChange.addEventListener('change', () => {
       bgColorPicker.disabled = !enableBgChange.checked;
+    });
+
+    sizeTemplate.addEventListener('change', () => {
+      const isCustom = sizeTemplate.value === 'custom';
+      customWidth.disabled = !isCustom;
+      customHeight.disabled = !isCustom;
     });
 
     uploadArea.addEventListener('click', () => upload.click());
