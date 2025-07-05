@@ -56,6 +56,11 @@
       border-radius: 8px;
       font-size: 16px;
     }
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
     #previewContainer {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -87,6 +92,11 @@
     button:hover {
       background: #1e88e5;
     }
+    .note {
+      font-size: 14px;
+      color: #777;
+      margin-top: -10px;
+    }
   </style>
 </head>
 <body>
@@ -99,9 +109,13 @@
     </div>
 
     <div class="controls">
+      <div class="checkbox-label">
+        <input type="checkbox" id="enableBgChange">
+        <label for="enableBgChange">启用证件照背景更换</label>
+      </div>
       <div>
         <label for="bgColor">选择新底色:</label>
-        <input type="color" id="bgColor" value="#ff0000">
+        <input type="color" id="bgColor" value="#ff0000" disabled>
       </div>
       <div>
         <label for="sizeTemplate">尺寸模板:</label>
@@ -120,7 +134,12 @@
         <label for="customHeight">高度 (px):</label>
         <input type="number" id="customHeight" placeholder="自定义高度">
       </div>
+      <div>
+        <label for="maxFileSize">最大文件大小 (MB):</label>
+        <input type="number" id="maxFileSize" placeholder="如 5 表示 <5MB">
+      </div>
     </div>
+    <p class="note">⚠️ 背景更换效果一般，加载较慢，请耐心等待</p>
 
     <div id="previewContainer"></div>
 
@@ -143,9 +162,15 @@
     const sizeTemplate = document.getElementById('sizeTemplate');
     const customWidth = document.getElementById('customWidth');
     const customHeight = document.getElementById('customHeight');
+    const enableBgChange = document.getElementById('enableBgChange');
+    const maxFileSizeInput = document.getElementById('maxFileSize');
     let net, zip;
 
     bodyPix.load().then(model => net = model);
+
+    enableBgChange.addEventListener('change', () => {
+      bgColorPicker.disabled = !enableBgChange.checked;
+    });
 
     uploadArea.addEventListener('click', () => upload.click());
     uploadArea.addEventListener('dragover', e => {
@@ -167,22 +192,35 @@
     async function processFiles(files) {
       previewContainer.innerHTML = '';
       zip = new JSZip();
+      const maxFileSize = parseFloat(maxFileSizeInput.value) || Infinity; // MB
+
       Array.from(files).forEach(async (file, index) => {
+        if (file.size / (1024 * 1024) > maxFileSize) {
+          console.warn(`跳过 ${file.name}，文件大小超过 ${maxFileSize}MB`);
+          return; // 跳过大文件
+        }
+
         const img = new Image();
         img.src = URL.createObjectURL(file);
         img.onload = async () => {
-          const segmentation = await net.segmentPerson(img, {
-            internalResolution: 'medium',
-            segmentationThreshold: 0.7
-          });
-          const bgColor = hexToRgba(bgColorPicker.value, 255);
-          const mask = bodyPix.toMask(segmentation, {r:0,g:0,b:0,a:0}, bgColor);
-
           const [w, h] = getTargetSize();
           canvas.width = w;
           canvas.height = h;
-          ctx.drawImage(img, 0, 0, w, h);
-          bodyPix.drawMask(canvas, img, mask, 1, 0, false);
+
+          if (enableBgChange.checked) {
+            // 背景替换
+            const segmentation = await net.segmentPerson(img, {
+              internalResolution: 'medium',
+              segmentationThreshold: 0.7
+            });
+            const bgColor = hexToRgba(bgColorPicker.value, 255);
+            const mask = bodyPix.toMask(segmentation, {r:0,g:0,b:0,a:0}, bgColor);
+            ctx.drawImage(img, 0, 0, w, h);
+            bodyPix.drawMask(canvas, img, mask, 1, 0, false);
+          } else {
+            // 不进行背景替换
+            ctx.drawImage(img, 0, 0, w, h);
+          }
 
           canvas.toBlob(blob => {
             const previewURL = URL.createObjectURL(blob);
@@ -227,13 +265,12 @@
       };
     }
   </script>
-<!-- 放在 </div> 和 </body> 之间 -->
-<footer style="margin-top: 30px; text-align: center; font-size: 14px; color: #555;">
-  制作人：<a href="https://karcen.github.io/zhengjiacheng.github.io/" target="_blank" rel="noopener noreferrer" style="color:#0077b6; text-decoration:none;">Karcen Zheng</a>，俺的邮箱是
-  <a href="mailto:karcenzheng@yeah.net" style="color:#0077b6; text-decoration:none;">karcenzheng@yeah.net</a>
-  <br>
-  纯属娱乐，希望可以帮助到大家，祝大家一切顺利！苟富贵勿相忘呜呜呜呜呜~
-</footer>
 
+  <footer style="margin-top: 30px; text-align: center; font-size: 14px; color: #555;">
+    制作人：<a href="https://karcen.github.io/zhengjiacheng.github.io/" target="_blank" rel="noopener noreferrer" style="color:#0077b6; text-decoration:none;">Karcen Zheng</a>，俺的邮箱是
+    <a href="mailto:karcenzheng@yeah.net" style="color:#0077b6; text-decoration:none;">karcenzheng@yeah.net</a>
+    <br>
+    纯属娱乐，希望可以帮助到大家，祝大家一切顺利！苟富贵勿相忘呜呜呜呜呜~
+  </footer>
 </body>
 </html>
