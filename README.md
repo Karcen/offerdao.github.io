@@ -1,7 +1,7 @@
 # 📸 offer到！AI 证件照换底色工具 / offer is here! AI Passport Photo Background Changer
 
 这是一个纯前端的 AI 证件照处理工具，基于 **TensorFlow\.js** 和 **BodyPix / MediaPipe** 模型。
-支持 **批量上传照片**，**精准抠图**，**一键换底色**（红、蓝、白等），并内置常用证件照尺寸（1寸/2寸/护照）（第二版已删除该功能）。
+支持 **批量上传照片**，**精准抠图**，**一键换底色**（红、蓝、白等），并内置常用证件照尺寸（1寸/2寸/护照）。
 无需服务器，直接在浏览器运行即可完成所有操作。
 做这个网页是因为报名夏令营不同的学校要上传不同要求的照片，很麻烦。
 
@@ -17,14 +17,14 @@ I developed this web application because applying to different schools for summe
 ✅ **精准抠图**（AI 人像分割，发丝级效果）
 ✅ **一键更换底色**（支持常用证件照背景色和自定义颜色）（加载缓慢且效果不咋地）
 ✅ **批量处理多张照片**
-✅ **内置标准证件照尺寸模板**（1寸、2寸、护照等）（第二版已删除该功能）
+✅ **内置标准证件照尺寸模板**（1寸、2寸、护照等）
 ✅ **支持导出 JPG / PNG / WebP 格式**
 ✅ **纯前端运行，无需安装，无需上传服务器**
 
 ✅ **Accurate person segmentation** (AI-powered, hair-level precision)
 ✅ **One-click background replacement** (standard passport colors & custom colors) (slow and low quality)
 ✅ **Batch processing of multiple photos**
-✅ **Built-in standard ID photo size templates** (1-inch, 2-inch, passport, etc.) (Cancelled in version 2)
+✅ **Built-in standard ID photo size templates** (1-inch, 2-inch, passport, etc.) 
 ✅ **Export to JPG / PNG / WebP formats**
 ✅ **Fully client-side, no installation or server required**
 
